@@ -55,7 +55,7 @@ bool scheduleConformsToMaxShifts(
     const DailySchedule& sched,
     const size_t to_day,
     const size_t to_shift,
-    std::set<Worker_T>& workersPerDay,
+    Worker_T*& workersPerDay,
     size_t*& worker_shifts,
     size_t current_day,
     size_t current_shift

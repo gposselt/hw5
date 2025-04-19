@@ -18,13 +18,16 @@ int main()
 {
     // Replace the matrix below with your test case
     AvailabilityMatrix avail = { 
-        {1, 1, 1, 1},
-        {1, 0, 1, 0},
-        {1, 1, 0, 1},
-        {1, 0, 0, 1}
+        {1, 1, 1, 0, 0, 0, 1},
+        {1, 1, 1, 0, 0, 0, 1},
+        {1, 1, 1, 0, 0, 0, 1},
+        {1, 1, 1, 0, 0, 0, 1},
+        {1, 1, 1, 0, 0, 0, 1},
+        {1, 1, 1, 0, 0, 0, 1},
+        {1, 1, 1, 0, 0, 0, 1}
     };
     DailySchedule sched;
-    bool solutionFound = schedule(avail, 2, 2, sched);
+    bool solutionFound = schedule(avail, 3, 3, sched);
     if(solutionFound)
     {
         printSchedule(sched);
@@ -40,7 +43,7 @@ void printAvailability(const AvailabilityMatrix& avail)
 {
 
     cout << "worker: ";
-    for (int i = 0; i < avail.size(); i++) {
+    for (size_t i = 0; i < avail.size(); i++) {
         cout << i << " ";
     }
     cout << endl;
