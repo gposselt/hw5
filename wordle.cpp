@@ -4,11 +4,12 @@
 // For std::remove
 #include <map>
 #include <set>
+#include <vector>
 #endif
 
 #include "wordle.h"
 
-#include <vector>
+
 
 #include "dict-eng.h"
 using namespace std;
