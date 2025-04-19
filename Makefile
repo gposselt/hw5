@@ -12,7 +12,7 @@ dict-eng.o : dict-eng.cpp dict-eng.h
 wordle.o : wordle.cpp wordle.h dict-eng.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@ 
 wordle-driver : wordle-driver.cpp wordle.o dict-eng.o
-	$(CXX) $(CXXFLAGS) $(DEFS)  $^ -o $@ 
+	$(CXX) $(CXXFLAGS) $(DEFS)  $^ -o $@ -pg
 schedwork.o : schedwork.cpp schedwork.h
 	$(CXX) $(CXXFLAGS) $(DEFS) -c $< -o $@ 
 schedwork-driver : schedwork-driver.cpp schedwork.o

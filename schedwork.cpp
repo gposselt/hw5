@@ -7,12 +7,12 @@
 #include <map>
 #include <algorithm>
 // add or remove necessary headers as you please
-
+#include <ext/concurrence.h>
 #endif
 
 #include "schedwork.h"
 
-#include <ext/concurrence.h>
+
 
 using namespace std;
 
@@ -23,6 +23,12 @@ static const Worker_T INVALID_ID = (unsigned int)-1;
 
 
 // Add prototypes for any helper functions here
+
+void init_vec_sizet(const size_t max, size_t*& vec, size_t i = 0) {
+    if (i >= max) return;
+    vec[i] = 0u;
+    return init_vec_sizet(max, vec, i + 1);
+}
 
 
 // Add your implementation of schedule() and other helper functions here
@@ -90,13 +96,16 @@ bool schedueSatisfiesConstraints(
     const size_t to_day,
     const size_t to_shift
     ) {
-    std::vector<size_t> worker_shifts;
-    for (size_t i = avail[0].size(); i --> 0;)
-        worker_shifts.push_back(0u);
+    size_t* worker_shifts = new size_t[avail[0].size()];
+    init_vec_sizet(avail[0].size(), worker_shifts);
 
     std::set<Worker_T> workersPerDay{};
 
-    return scheduleConformsToMaxShifts(avail, dailyNeed, maxShifts, sched, to_day, to_shift, workersPerDay, worker_shifts, 0, 0);
+    bool success = scheduleConformsToMaxShifts(avail, dailyNeed, maxShifts, sched, to_day, to_shift, workersPerDay, worker_shifts, 0, 0);
+
+    delete [] worker_shifts;
+
+    return success;
 
 
 }
@@ -109,7 +118,7 @@ bool scheduleConformsToMaxShifts(
     const size_t to_day,
     const size_t to_shift,
     std::set<Worker_T>& workersPerDay,
-    std::vector<size_t>& worker_shifts,
+    size_t*& worker_shifts,
     size_t current_day,
     size_t current_shift
     ){
