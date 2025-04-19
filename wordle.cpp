@@ -2,7 +2,6 @@
 // For debugging
 #include <iostream>
 // For std::remove
-#include <algorithm> 
 #include <map>
 #include <set>
 #endif
@@ -17,16 +16,62 @@ using namespace std;
 
 // Add prototypes of helper functions here
 
-std::string strtolower(const std::string& str) {
-    std::string output{};
+std::string strtolower(const std::string& str, std::string output = {},  size_t i = 0) {
 
-    for (char c : str) {
-        output += static_cast<char>(tolower(c));
-    }
+    if (i >= str.size() ) return output;
 
-    return output;
+    char c = str[i];
+
+    output += static_cast<char>(tolower(c));
+
+    return strtolower(str, output, i + 1);
 }
 
+
+void addLocationFilters(const std::string& in, std::vector<static_location_filter*>& location_filters, size_t i = 0) {
+    if (i >= in.size()) return;
+
+    const char c = in[i];
+    if (c == '-') return addLocationFilters(in, location_filters, i + 1); //skip empty characters
+
+    location_filters.push_back(new static_location_filter{i, c});
+
+    return addLocationFilters(in, location_filters, i + 1);
+}
+
+void addFloatingLetterOccurances(const std::string& floating, std::map<char, int>& floating_letter_occurances, std::size_t i = 0) {
+    if (i >= floating.size()) return;
+
+    char c = floating[i];
+
+    if (floating_letter_occurances.find(c) == floating_letter_occurances.end()) {
+        floating_letter_occurances.insert(std::make_pair(c, 0));
+    }
+
+    floating_letter_occurances[c] = floating_letter_occurances[c] + 1;
+
+    return addFloatingLetterOccurances(floating, floating_letter_occurances, i + 1);
+}
+
+
+void addFloatingLetterFilters(
+    std::vector<word_filter*>& filters,
+    std::vector<static_location_filter*>& location_filters,
+    std::map<char, int>& floating_letter_occurances,
+    std::map<char, int>::iterator& it
+    ) {
+
+    if (it == floating_letter_occurances.end()) return;
+
+    pair<const char, int> letter = *it;
+    floating_letter_filter* filter = new floating_letter_filter{letter.first, letter.second, location_filters};
+
+    filters.push_back(filter);
+
+    ++it;
+
+    addFloatingLetterFilters(filters, location_filters, floating_letter_occurances, it);
+}
 
 // Definition of primary wordle function
 std::set<std::string> wordle(
@@ -42,32 +87,15 @@ std::set<std::string> wordle(
 
 
     std::vector<static_location_filter*> location_filters{};
-    for (size_t i = 0; i < in.size(); i++) {
-        const char c = in[i];
-        if (c == '-') continue; //skip empty characters
 
-        location_filters.push_back(new static_location_filter{i, c});
-    }
+    addLocationFilters(in, location_filters);
 
     std::map<char, int> floating_letter_occurances{};
 
-    for (const char& a : floating) {
-        char c = a;
+    addFloatingLetterOccurances(floating, floating_letter_occurances);
 
-
-        if (floating_letter_occurances.find(c) == floating_letter_occurances.end()) {
-            floating_letter_occurances.insert(std::make_pair(c, 0));
-        }
-
-        floating_letter_occurances[c] = floating_letter_occurances[c] + 1;
-
-    }
-
-    for (pair<const char, int> letter : floating_letter_occurances) {
-        floating_letter_filter* filter = new floating_letter_filter{letter.first, letter.second, location_filters};
-
-        filters.push_back(filter);
-    }
+    std::map<char, int>::iterator floating_letters = floating_letter_occurances.begin();
+    addFloatingLetterFilters(filters, location_filters, floating_letter_occurances, floating_letters);
 
     std::vector<word_filter*>::iterator before_floating = filters.begin();
     ++before_floating;

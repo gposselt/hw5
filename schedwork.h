@@ -3,6 +3,7 @@
 
 #ifndef RECCHECK
 #include <vector>
+#include <set>
 #endif
 
 // type for the ID of a worker

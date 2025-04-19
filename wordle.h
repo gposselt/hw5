@@ -4,8 +4,8 @@
 #ifndef RECCHECK
 #include <set>
 #include <string>
-#endif
 #include <vector>
+#endif
 
 /**
  * @brief Returns the list of all legal words in the provided dictionary
@@ -31,28 +31,39 @@ struct word_filter {
 
 struct location_filter : word_filter {
     /**
-     * Override to make it easier to code :3
-     * @param word The word test to match
-     * @return false iff the word could not possibly be the wordle word according to this filter
-     */
-    bool operator()(const std::string& word) const override {
-        for (size_t i = 0; i < word.size(); i++) {
-            char letter = word[i];
-
-            if (!(*this)(i, letter)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      *
      * @param locationInWord The location in a test word that this filter is getting applied at
      * @param letterAtLocation The letter at that location in the test word
      * @return false iff the word could not possibly be the wordle word according to this filter
      */
     virtual bool operator()(size_t locationInWord, char letterAtLocation) const = 0;
+
+    /**
+     * Override to make it easier to code :3
+     * @param word The word test to match
+     * @return false iff the word could not possibly be the wordle word according to this filter
+     */
+    bool operator()(const std::string& word) const override {
+        return interalWordFilter(word);
+    }
+
+private:
+    bool interalWordFilter(const std::string& word, size_t i = 0) const {
+
+        if (i >= word.size()) {
+            return true;
+        }
+
+        char letter = word[i];
+
+        if (!(*this)(i, letter)) {
+            return false;
+        }
+
+        return interalWordFilter(word, i + 1);
+    }
+
+
 };
 
 struct static_location_filter : location_filter {
@@ -77,29 +88,49 @@ struct floating_letter_filter : word_filter {
 
     floating_letter_filter(char letter, int occurrences, const std::vector<static_location_filter*>& locations_to_avoid) : letter(letter), occurrences(occurrences), filters(locations_to_avoid) {}
 
+private:
+    bool excludeStaticLocFilters(size_t char_location, const char c, std::vector<static_location_filter*>::const_iterator& it) const {
+
+        if (it == this->filters.end()) {
+            return false;
+        }
+
+        if ((*it)->location == char_location && (**it)(char_location, c)) {
+            return true;
+        }
+
+        it++;
+
+        return excludeStaticLocFilters(char_location, c, it);
+
+    }
+
+    void doLetterCount(const std::string& word, int& letter_count, size_t i = 0) const {
+
+        if (i >= word.size()) return;
+
+        const char c = word[i];
+
+        std::vector<static_location_filter*>::const_iterator it = this->filters.begin();
+
+
+        if (excludeStaticLocFilters(i, c, it)) {
+            return doLetterCount(word, letter_count, i + 1);
+        }
+
+        if (c == letter) {
+            letter_count++;
+        }
+
+        return doLetterCount(word, letter_count, i + 1);
+    }
+
     bool operator()(const std::string& word) const override {
         int letter_count = 0;
 
-        for (size_t i = 0; i < word.size(); i++) {
-            const char c = word[i];
 
-            bool cont = false;
+        doLetterCount(word, letter_count);
 
-            for (const static_location_filter* locFilter : filters) {
-                if (locFilter->location == i && (*locFilter)(i, c)) {
-                    cont = true;
-                    break;
-                }
-            }
-
-            if (cont) {
-                continue;
-            }
-
-            if (c == letter) {
-                letter_count++;
-            }
-        }
 
         return letter_count >= occurrences;
     }
