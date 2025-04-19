@@ -72,19 +72,11 @@ bool scheduleInteral(
 
         sched[current_day][current_shift] = currentWorkerID;
 
-        if (!schedueSatisfiesConstraints(avail, dailyNeed, maxShifts, sched, current_day, current_shift)) {
+        if (!schedueSatisfiesConstraints(avail, dailyNeed, maxShifts, sched, current_day, current_shift)) continue;
 
-            continue;
-        }
-
-        if (scheduleInteral(avail, dailyNeed, maxShifts, sched, current_day, current_shift + 1)) {
-            return true;
-        }
+        if (scheduleInteral(avail, dailyNeed, maxShifts, sched, current_day, current_shift + 1)) return true;
 
     }
-
-
-    // sched[current_day][current_day] = INVALID_ID;
 
     return false;
 }
@@ -102,8 +94,8 @@ bool schedueSatisfiesConstraints(
     for (size_t i = avail[0].size(); i --> 0;)
         worker_shifts.push_back(0u);
 
-
     std::set<Worker_T> workersPerDay{};
+
     return scheduleConformsToMaxShifts(avail, dailyNeed, maxShifts, sched, to_day, to_shift, workersPerDay, worker_shifts, 0, 0);
 
 
@@ -123,9 +115,7 @@ bool scheduleConformsToMaxShifts(
     ){
 
     //iterated through the section we need to and found no errors
-    if (current_shift >= to_shift && current_day >= to_day) {
-        return true;
-    }
+    if (current_shift >= to_shift && current_day >= to_day) return true;
 
     //advance day
     if (current_shift >= sched[current_day].size()) {
@@ -135,15 +125,12 @@ bool scheduleConformsToMaxShifts(
     }
 
     //finished iterating
-    if (current_day >= sched.size()) {
-        return true;
-    }
+    if (current_day >= sched.size()) return true;
 
     Worker_T current_worker = sched[current_day][current_shift];
     std::pair<std::set<Worker_T>::iterator, bool> insertResult = workersPerDay.insert(current_worker);
 
-    if (!insertResult.second)
-        return false;
+    if (!insertResult.second) return false;
 
     if (current_worker != INVALID_ID) {
         worker_shifts[current_worker]++;
@@ -152,9 +139,7 @@ bool scheduleConformsToMaxShifts(
         return false;
     }
 
-    if (worker_shifts[current_worker] > maxShifts) {
-        return false;
-    }
+    if (worker_shifts[current_worker] > maxShifts) return false;
 
     return scheduleConformsToMaxShifts(
         avail,
@@ -178,17 +163,11 @@ void createAndFillSchedule(
     size_t current_shift
 ) {
 
-    if (current_day >= avail.size()) {
-        return;
-    }
-
     if (current_shift >= daily_need) {
         current_day += 1;
         current_shift = 0;
 
-        if (current_day >= avail.size()) {
-            return;
-        }
+        if (current_day >= avail.size()) return;
 
         sched.emplace_back();
     }else if (current_day == 0 && current_shift == 0) {
