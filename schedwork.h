@@ -38,4 +38,43 @@ bool schedule(
     DailySchedule& sched
 );
 
+bool schedueSatisfiesConstraints(
+    const AvailabilityMatrix& avail,
+    const size_t dailyNeed,
+    const size_t maxShifts,
+    const DailySchedule& sched,
+    const size_t to_day,
+    const size_t to_shift
+);
+
+bool scheduleConformsToMaxShifts(
+    const AvailabilityMatrix& avail,
+    const size_t dailyNeed,
+    const size_t maxShifts,
+    const DailySchedule& sched,
+    const size_t to_day,
+    const size_t to_shift,
+    std::set<Worker_T>& workersPerDay,
+    std::vector<size_t>& worker_shifts,
+    size_t current_day,
+    size_t current_shift
+);
+
+bool scheduleInteral(
+    const AvailabilityMatrix& avail,
+    const size_t dailyNeed,
+    const size_t maxShifts,
+    DailySchedule& sched,
+    size_t current_day = 0,
+    size_t current_shift = 0
+);
+
+void createAndFillSchedule(
+    const AvailabilityMatrix& avail,
+    const size_t daily_need,
+    DailySchedule& sched,
+    size_t current_day = 0,
+    size_t current_shift = 0
+);
+
 #endif

@@ -36,6 +36,28 @@ int main()
     return 0;
 }
 
+void printAvailability(const AvailabilityMatrix& avail)
+{
+
+    cout << "worker: ";
+    for (int i = 0; i < avail.size(); i++) {
+        cout << i << " ";
+    }
+    cout << endl;
+
+    int day = 0;
+    for(vector<bool> d : avail)
+    {
+        cout << "Day " << day << ": ";
+        for(bool aval : d)
+        {
+            cout << boolalpha << aval << " ";
+        }
+        cout << endl;
+        day++;
+    }
+}
+
 void printSchedule(const DailySchedule& sched)
 {
     int day = 0;
