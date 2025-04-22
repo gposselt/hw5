@@ -21,7 +21,9 @@ typedef std::vector<std::vector<Worker_T> > DailySchedule;
  *        shifts any single worker is allowed. Returns true
  *        and the valid schedule if a solution exists, and false
  *        otherwise. 
- * 
+ *
+ * @pre avail is a rectangle with no variation
+ *
  * @param [in]  avail n x k vector of vectors (i.e. matrix) of the availability
  *                    of the k workers for each of the n days
  * @param [in]  dailyNeed Number of workers needed per day (aka d)
@@ -41,11 +43,13 @@ bool schedule(
 
 bool schedueSatisfiesConstraints(
     const AvailabilityMatrix& avail,
-    const size_t dailyNeed,
+    // const size_t dailyNeed,
     const size_t maxShifts,
     const DailySchedule& sched,
     const size_t to_day,
-    const size_t to_shift
+    const size_t to_shift,
+    size_t*& worker_shifts,
+    Worker_T*& workersPerDay
 );
 
 bool scheduleConformsToMaxShifts(
@@ -66,10 +70,21 @@ bool scheduleInteral(
     const size_t dailyNeed,
     const size_t maxShifts,
     DailySchedule& sched,
+    size_t*& worker_shifts,
+    Worker_T*& workersPerDay,
     size_t current_day = 0,
     size_t current_shift = 0
 );
 
+/**
+ *
+ * @param avail availability matrix
+ * @param daily_need daily need for workers
+ * @param sched schedule to fill
+ * @param current_day iteration variable
+ * @param current_shift current shift
+ * @pre sched is a DailySchedule with a single entry of a vector
+ */
 void createAndFillSchedule(
     const AvailabilityMatrix& avail,
     const size_t daily_need,

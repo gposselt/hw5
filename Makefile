@@ -14,9 +14,9 @@ wordle.o : wordle.cpp wordle.h dict-eng.h
 wordle-driver : wordle-driver.cpp wordle.o dict-eng.o
 	$(CXX) $(CXXFLAGS) $(DEFS)  $^ -o $@
 schedwork.o : schedwork.cpp schedwork.h
-	$(CXX) $(CXXFLAGS) $(DEFS) -c $< -o $@ -pg
+	$(CXX) $(CXXFLAGS) $(DEFS) -c $< -o $@
 schedwork-driver : schedwork-driver.cpp schedwork.o
-	$(CXX) $(CXXFLAGS) $(DEFS)  $^ -o $@ -pg
+	$(CXX) $(CXXFLAGS) $(DEFS)  $^ -o $@
 
 
 
